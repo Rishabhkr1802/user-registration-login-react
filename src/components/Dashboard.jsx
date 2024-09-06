@@ -8,7 +8,7 @@ import Sidebar from './Sidebar';
 
 const Dashboard = () => {
     const [logindata, setLoginData] = useState([]);
-    const [menu, setMenu] = useState('profile');
+    const [menu, setMenu] = useState('home');
     const history = useNavigate();
 
     useEffect(() => {
@@ -37,11 +37,11 @@ const Dashboard = () => {
             {logindata.length === 0 ? <Error /> :
                 <div className="container-fluid mt-3">
                     <div className="row">
-                        <div className="col-3">
+                        <div className="col-lg-3 col-md-4 col-xs-2">
                             <Sidebar page={menu} onSelectionMenu={selectedMenu} />
                         </div>
-                        <div className="col-9">
-                            {menu === 'profile' ? <div className="d-flex justify-content-between">
+                        <div className="col-lg-9 col-md-4 col-xs-2 mt-2">
+                            {menu === 'home' ? <div className="d-flex justify-content-between">
                                 <h1>Welcome - {logindata[0].name}</h1>
                                 <Button variant="primary" onClick={userlogout} style={{ background: "rgb(67, 185, 127)" }} >LogOut</Button>
                             </div> : <Emailer />}

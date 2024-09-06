@@ -1,52 +1,19 @@
 
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import LandingpageImage from './LandingpageImage';
 import { ToastContainer, toast } from 'react-toastify';
+import emailjs from '@emailjs/browser';
 
 const Emailer = () => {
+
+    const form = useRef();
     const [sentEmail, setSentEmail] = useState(false);
     const [inpval, setInpval] = useState({
         email: "",
-        subject: "",
-        body: ""
+        name: "",
+        message: ""
     })
-
-    const addData = (e) => {
-        e.preventDefault();
-        const { email, subject, body } = inpval;
-
-        if (email === "") {
-            toast.error(' Recipent is requred!', {
-                position: "top-center",
-            });
-        } else if (!email.includes("@")) {
-            toast.error('please enter valid email address', {
-                position: "top-center",
-            });
-        }
-        else if (subject === "") {
-            toast.error('Subject field is requred', {
-                position: "top-center",
-            });
-        } else if (body === "") {
-            toast.error('body field is requred', {
-                position: "top-center",
-            });
-        } else if (body.length < 5) {
-            toast.error('body length greater five', {
-                position: "top-center",
-            });
-        } else {
-            localStorage.setItem("Email", JSON.stringify([inpval]));
-            setSentEmail(true);
-        }
-    }
 
     const getdata = (e) => {
         const { value, name } = e.target;
@@ -58,28 +25,76 @@ const Emailer = () => {
         })
     }
 
+    const sendEmail = (e) => {
+        e.preventDefault();
+        const { email, name, message } = inpval;
+
+        if (email === "") {
+            toast.error(' Email Field is requred!', {
+                position: "top-center",
+            });
+        } else if (!email.includes("@")) {
+            toast.error('please enter valid email address', {
+                position: "top-center",
+            });
+        }
+        else if (name === "") {
+            toast.error('name field is requred', {
+                position: "top-center",
+            });
+        } else if (message === "") {
+            toast.error('Message field is requred', {
+                position: "top-center",
+            });
+        } else if (message.length < 5) {
+            toast.error('message length greater five', {
+                position: "top-center",
+            });
+        } else {
+            emailjs
+                .sendForm('service_rhlp599', 'template_g549ch9', form.current, {
+                    publicKey: 'WCwE_IjpJ39XzQb2D',
+                })
+                .then(
+                    () => {
+                        console.log('Email Sent Successfully');
+                    },
+                    (error) => {
+                        console.log('FAILED...', error.text);
+                    },
+                );
+            e.target.reset();
+            setSentEmail(true);
+            // localStorage.setItem("Email", JSON.stringify([inpval]));
+        }
+    }
+
     return (
-        <center>
-            {sentEmail ? <h2 className='display-4'>Email Sent Successfully</h2> : <Form>
-                <h3 className="display-6">Mail to:</h3>
-                <Form.Group className="mb-3 col-lg-6" controlId="formRecipentEmail">
-                    <Form.Control type="email" name='email' onChange={getdata} placeholder="Recipent email" />
-                </Form.Group>
-
-                <Form.Group className="mb-3 col-lg-6" controlId="formEmailSubject">
-                    <Form.Control type="text" name='subject' onChange={getdata} placeholder="Email Subject" />
-                </Form.Group>
-
-                <Form.Group className="mb-3 col-lg-6" controlId="formEmailBody">
-                    <Form.Control as="textarea" rows={3} name='body' onChange={getdata} placeholder="Email Body" />
-                </Form.Group>
-
-                <Button variant="primary" className='col-lg-6' onClick={addData} style={{ background: "rgb(67, 185, 127)" }} type="submit">
-                    Send
-                </Button>
-            </Form>}
+        <>
+            {sentEmail ? <h2 className='display-4'>Email Sent Successfully</h2> :
+                <div className="row">
+                    <div className="col-md-offset-6">
+                        <form ref={form} onSubmit={sendEmail}>
+                            <h3 className="display-6">Mail to:</h3>
+                            <div class="form-group m-2">
+                                <label for="email">Email address</label>
+                                <input type="email" name="email" class="form-control" placeholder="send to" onChange={getdata} />
+                            </div>
+                            <div class="form-group m-2">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" class="form-control" placeholder="name" onChange={getdata} />
+                            </div>
+                            <div class="form-group m-2">
+                                <label for="messsage">Message</label>
+                                <textarea name="message" placeholder='Message' className='form-control' onChange={getdata}></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success m-2">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            }
             <ToastContainer />
-        </center>
+        </>
     );
 }
 
